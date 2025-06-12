@@ -1,0 +1,48 @@
+ private void clientesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CadastroClientesForm clientesForm = new CadastroClientesForm();
+            clientesForm.TopLevel = false;
+            clientesForm.FormBorderStyle = FormBorderStyle.None;
+            clientesForm.Dock = DockStyle.Fill;
+            panelConteudo.Controls.Clear();
+            panelConteudo.Controls.Add(clientesForm);
+            clientesForm.Show();
+        }
+
+        private void produtosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CadastroProdutosForm produtosForm = new CadastroProdutosForm();
+            produtosForm.TopLevel = false;
+            produtosForm.FormBorderStyle = FormBorderStyle.None;
+            produtosForm.Dock = DockStyle.Fill;
+            panelConteudo.Controls.Clear();
+            panelConteudo.Controls.Add(produtosForm);
+            produtosForm.Show();
+        }
+
+        private void pedidosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CadastroPedidosForm pedidosForm = new CadastroPedidosForm();
+            pedidosForm.TopLevel = false;
+            pedidosForm.FormBorderStyle = FormBorderStyle.None;
+            pedidosForm.Dock = DockStyle.Fill;
+            panelConteudo.Controls.Clear();
+            panelConteudo.Controls.Add(pedidosForm);
+            pedidosForm.Show();
+        }
+
+        private void usuariosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CadastroUsuariosForm usuariosForm = new CadastroUsuariosForm();
+            usuariosForm.TopLevel = false;
+            usuariosForm.FormBorderStyle = FormBorderStyle.None;
+            usuariosForm.Dock = DockStyle.Fill;
+            panelConteudo.Controls.Clear();
+            panelConteudo.Controls.Add(usuariosForm);
+            usuariosForm.Show();
+        }
+
+        private void sobreToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Sistema de Gerenciamento\nVersão 1.0", "Sobre", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
