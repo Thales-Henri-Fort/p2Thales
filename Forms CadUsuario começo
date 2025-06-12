@@ -1,0 +1,77 @@
+public partial class FormCadastro : Form
+{
+    private string usuarioLogado;
+
+    public FormCadastro(string usuario = null)
+    {
+        InitializeComponent();
+        usuarioLogado = usuario;
+        if (usuarioLogado != null)
+        {
+            lblUsuario.Text = $"Logado como: {usuarioLogado}";
+        }
+    }
+
+    private void btnCadastrar_Click(object sender, EventArgs e)
+    {
+        string usuario = txtUsuario.Text;
+        string senha = txtSenha.Text;
+
+        if (string.IsNullOrWhiteSpace(usuario) || string.IsNullOrWhiteSpace(senha))
+        {
+            MessageBox.Show("Usuário e senha são obrigatórios.");
+            return;
+        }
+
+        if (usuarioLogado == "ADMIN")
+        {
+            File.AppendAllText("usuarios.csv", $"{usuario},{senha}\n");
+            MessageBox.Show("Usuário cadastrado com sucesso.");
+        }
+        else
+        {
+            MessageBox.Show("Apenas o ADMIN pode cadastrar usuários.");
+        }
+    }
+
+    private void btnAlterarSenha_Click(object sender, EventArgs e)
+    {
+        string novaSenha = txtNovaSenha.Text;
+
+        if (string.IsNullOrWhiteSpace(novaSenha))
+        {
+            MessageBox.Show("Nova senha é obrigatória.");
+            return;
+        }
+
+        var linhas = File.ReadAllLines("usuarios.csv").ToList();
+        for (int i = 0; i < linhas.Count; i++)
+        {
+            var dados = linhas[i].Split(',');
+            if (dados[0] == usuarioLogado)
+            {
+                linhas[i] = $"{dados[0]},{novaSenha}";
+                File.WriteAllLines("usuarios.csv", linhas);
+                MessageBox.Show("Senha alterada com sucesso.");
+                return;
+            }
+        }
+        MessageBox.Show("Usuário não encontrado.");
+    }
+
+    private void btnExcluir_Click(object sender, EventArgs e)
+    {
+        if (usuarioLogado == "ADMIN")
+        {
+            string usuarioParaExcluir = txtUsuario.Text;
+            var linhas = File.ReadAllLines("usuarios.csv").ToList();
+            linhas.RemoveAll(l => l.StartsWith(usuarioParaExcluir + ","));
+            File.WriteAllLines("usuarios.csv", linhas);
+            MessageBox.Show("Usuário excluído com sucesso.");
+        }
+        else
+        {
+            MessageBox.Show("Apenas o ADMIN pode excluir usuários.");
+        }
+    }
+}
