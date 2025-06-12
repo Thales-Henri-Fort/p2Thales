@@ -1,0 +1,63 @@
+private async void btnBuscarEndereco_Click(object sender, EventArgs e)
+{
+    string cep = txtCEP.Text.Trim();
+    if (!string.IsNullOrEmpty(cep))
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            try
+            {
+                string url = $"https://viacep.com.br/ws/{cep}/json/";
+                var response = await client.GetStringAsync(url);
+                var endereco = JsonConvert.DeserializeObject<Endereco>(response);
+
+                if (endereco != null && !endereco.erro)
+                {
+                    txtLogradouro.Text = endereco.logradouro;
+                    txtBairro.Text = endereco.bairro;
+                    txtCidade.Text = endereco.localidade;
+                    txtEstado.Text = endereco.uf;
+                }
+                else
+                {
+                    MessageBox.Show("CEP não encontrado.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro: {ex.Message}");
+            }
+        }
+    }
+    else
+    {
+        MessageBox.Show("Por favor, insira um CEP.");
+    }
+}
+
+public class Endereco
+{
+    public string logradouro { get; set; }
+    public string bairro { get; set; }
+    public string localidade { get; set; }
+    public string uf { get; set; }
+    public bool erro { get; set; }
+}
+
+private void btnSalvar_Click(object sender, EventArgs e)
+{
+    string caminhoArquivo = "clientes.csv";
+    string[] linhas = {
+        $"{txtNome.Text},{txtCPF.Text},{txtEmail.Text},{txtCEP.Text},{txtLogradouro.Text},{txtNumero.Text},{txtBairro.Text},{txtCidade.Text},{txtEstado.Text},{txtTelefone.Text},{txtWhatsApp.Text}"
+    };
+
+    try
+    {
+        File.AppendAllLines(caminhoArquivo, linhas);
+        MessageBox.Show("Dados salvos com sucesso!");
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"Erro ao salvar dados: {ex.Message}");
+    }
+}
