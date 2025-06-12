@@ -1,0 +1,58 @@
+ private bool ValidarCredenciais(string usuario, string senha)
+    {
+        // Validação com credenciais de administrador
+        if (usuario == "ADMIN" && senha == "123")
+        {
+            return true;
+        }
+
+        // Validação com arquivo CSV 
+        try
+        {
+            using (var reader = new StreamReader("credenciais.csv"))
+            {
+                while (!reader.EndOfStream)
+                {
+                    var linha = reader.ReadLine();
+                    if (linha != null)
+                    {
+                        var valores = linha.Split(',');
+                        if (valores.Length == 2 && valores[0] == usuario && valores[1] == senha)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception)
+        {
+            MessageBox.Show("Erro ao ler o arquivo de credenciais.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return false; // Impede o login se houver um erro na leitura do arquivo
+        }
+
+        return false;
+    }
+
+    private void btnLogin_Click(object sender, EventArgs e)
+    {
+        string usuario = txtUsuario.Text;
+        string senha = txtSenha.Text;
+
+        if (ValidarCredenciais(usuario, senha))
+        {
+            // Credenciais válidas
+            lblMensagemErro.Visible = false; // Esconde qualquer mensagem de erro anterior
+
+            // Abre o formulário principal
+            FormPrincipal formPrincipal = new FormPrincipal();
+            formPrincipal.Show();
+            this.Hide(); // Oculta o formulário de login
+        }
+        else
+        {
+            // Credenciais inválidas
+            lblMensagemErro.Text = "Usuário ou senha incorretos.";
+            lblMensagemErro.Visible = true;
+        }
+    }
