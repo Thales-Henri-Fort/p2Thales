@@ -1,0 +1,184 @@
+public partial class Form1 : Form
+    {
+        private const string arquivoProdutos = "produtos.txt";
+        private List<Produto> produtos = new List<Produto>();
+        private int produtoSelecionadoIndex = -1; // Para edição e exclusão
+
+        public Form1()
+        {
+            InitializeComponent();
+            CarregarProdutos(); // Carrega os produtos do arquivo ao iniciar
+        }
+
+        // Classe para representar um produto
+        public class Produto
+        {
+            public string Nome { get; set; }
+            public decimal Preco { get; set; }
+            public string Descricao { get; set; }
+
+            public override string ToString()
+            {
+                return $"{Nome} - R${Preco:F2}"; // Formatação para exibição na lista
+            }
+        }
+
+        // Método para limpar os campos do formulário
+        private void LimparCampos()
+        {
+            textBoxNome.Clear();
+            textBoxPreco.Clear();
+            textBoxDescricao.Clear();
+            produtoSelecionadoIndex = -1; // Reset para edição/exclusão
+            buttonSalvar.Text = "Salvar"; // Retorna ao modo "Salvar"
+        }
+
+        // Método para salvar um produto
+        private void SalvarProduto()
+        {
+            if (string.IsNullOrWhiteSpace(textBoxNome.Text) ||
+                string.IsNullOrWhiteSpace(textBoxPreco.Text) ||
+                string.IsNullOrWhiteSpace(textBoxDescricao.Text))
+            {
+                MessageBox.Show("Por favor, preencha todos os campos.");
+                return;
+            }
+
+            try
+            {
+                decimal preco = Convert.ToDecimal(textBoxPreco.Text);
+
+                Produto novoProduto = new Produto
+                {
+                    Nome = textBoxNome.Text,
+                    Preco = preco,
+                    Descricao = textBoxDescricao.Text
+                };
+
+                if (produtoSelecionadoIndex == -1) // Adicionar novo produto
+                {
+                    produtos.Add(novoProduto);
+                }
+                else // Editar produto existente
+                {
+                    produtos[produtoSelecionadoIndex] = novoProduto;
+                    produtoSelecionadoIndex = -1; // Reset
+                    buttonSalvar.Text = "Salvar";
+                }
+
+                SalvarProdutosNoArquivo();
+                CarregarProdutos(); // Atualiza a lista
+                LimparCampos();
+                MessageBox.Show("Produto salvo com sucesso!");
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Preço inválido. Insira um valor numérico.");
+            }
+        }
+
+        // Método para carregar os produtos do arquivo
+        private void CarregarProdutos()
+        {
+            produtos.Clear(); // Limpa a lista atual
+            listBoxProdutos.Items.Clear(); 
+
+            if (File.Exists(arquivoProdutos))
+            {
+                try
+                {
+                    string[] linhas = File.ReadAllLines(arquivoProdutos);
+                    foreach (string linha in linhas)
+                    {
+                        string[] campos = linha.Split(';'); 
+                        if (campos.Length == 3)
+                        {
+                            Produto produto = new Produto
+                            {
+                                Nome = campos[0],
+                                Preco = decimal.Parse(campos[1]),
+                                Descricao = campos[2]
+                            };
+                            produtos.Add(produto);
+                            listBoxProdutos.Items.Add(produto); 
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro ao carregar produtos do arquivo: {ex.Message}");
+                }
+            }
+        }
+
+        // Método para salvar os produtos no arquivo
+        private void SalvarProdutosNoArquivo()
+        {
+            try
+            {
+                List<string> linhas = new List<string>();
+                foreach (Produto produto in produtos)
+                {
+                    linhas.Add($"{produto.Nome};{produto.Preco};{produto.Descricao}"); 
+                }
+                File.WriteAllLines(arquivoProdutos, linhas);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao salvar produtos no arquivo: {ex.Message}");
+            }
+        }
+
+        // Evento do botão Salvar
+        private void buttonSalvar_Click(object sender, EventArgs e)
+        {
+            SalvarProduto();
+        }
+
+        // Evento do botão Limpar
+        private void buttonLimpar_Click(object sender, EventArgs e)
+        {
+            LimparCampos();
+        }
+
+        // Evento do botão Listar (se você tiver um botão Listar)
+        private void buttonListar_Click(object sender, EventArgs e)
+        {
+        }
+
+        // Evento do botão Editar
+        private void buttonEditar_Click(object sender, EventArgs e)
+        {
+            if (listBoxProdutos.SelectedIndex != -1)
+            {
+                produtoSelecionadoIndex = listBoxProdutos.SelectedIndex;
+                Produto produtoSelecionado = produtos[produtoSelecionadoIndex];
+                textBoxNome.Text = produtoSelecionado.Nome;
+                textBoxPreco.Text = produtoSelecionado.Preco.ToString();
+                textBoxDescricao.Text = produtoSelecionado.Descricao;
+                buttonSalvar.Text = "Atualizar"; 
+            }
+            else
+            {
+                MessageBox.Show("Selecione um produto para editar.");
+            }
+        }
+
+        // Evento do botão Excluir
+        private void buttonExcluir_Click(object sender, EventArgs e)
+        {
+            if (listBoxProdutos.SelectedIndex != -1)
+            {
+                int index = listBoxProdutos.SelectedIndex;
+                produtos.RemoveAt(index);
+                SalvarProdutosNoArquivo();
+                CarregarProdutos(); // Atualiza a lista
+                LimparCampos();
+                MessageBox.Show("Produto excluído com sucesso!");
+            }
+            else
+            {
+                MessageBox.Show("Selecione um produto para excluir.");
+            }
+        }
+    }
